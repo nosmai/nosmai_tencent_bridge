@@ -12,7 +12,7 @@ if [[ ! "$PROFILE" =~ ^[A-Za-z][A-Za-z0-9_-]*$ ]]; then
 fi
 shift
 CONFIG="$ROOT/config/$PROFILE.json"
-python3 tools/check_config.py "$CONFIG"
+check_profile "$CONFIG"
 ARGS=()
 if [[ $# -gt 0 && "$1" != --* ]]; then
   ARGS+=(-d "$1")

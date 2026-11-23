@@ -1,6 +1,6 @@
 # Nosmai Tencent Bridge for Flutter
 
-`nosmai_tencent_live` publishes Nosmai’s processed camera frames to Tencent RTC on Android and iOS. The repository guide covers installation, host initialization, local preview, publishing and the two-phone example. [Integration guide](../../README.md)
+`nosmai_tencent_live` publishes Nosmai’s processed camera frames to Tencent RTC on Android and iOS. The repository guide covers installation, host initialization, local preview and publishing. [Integration guide](../../README.md)
 
 ## Broadcaster
 

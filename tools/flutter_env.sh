@@ -12,3 +12,16 @@ else
   echo "ERROR: Flutter is not in PATH. Set FLUTTER_BIN to your Flutter binary or use your configured FVM terminal." >&2
   exit 1
 fi
+
+# Use the Dart SDK from the same Flutter installation for local profile checks.
+check_profile() {
+  local flutter_path dart_bin
+  if [[ "${FLUTTER[0]}" == fvm ]]; then
+    fvm dart "$ROOT/tools/check_profile.dart" "$1"
+  else
+    flutter_path=$(command -v "${FLUTTER[0]}")
+    dart_bin="$(dirname "$flutter_path")/dart"
+    if [[ ! -x "$dart_bin" ]]; then dart_bin=dart; fi
+    "$dart_bin" "$ROOT/tools/check_profile.dart" "$1"
+  fi
+}

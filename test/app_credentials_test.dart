@@ -5,7 +5,7 @@ void main() {
   group('Credential validation', () {
     test('missing setup returns an actionable message', () {
       const credentials = AppCredentials(sdkAppId: 0, userId: '', userSig: '');
-      expect(credentials.validate(), contains('configure.sh'));
+      expect(credentials.validate(), contains('SDK_APP_ID'));
     });
 
     test('configured test credentials pass local checks', () {

@@ -135,25 +135,4 @@ Future<void> endLive() async {
 - **App lifecycle.** By default the broadcaster pauses video and microphone capture for the room when the app goes into the background and resumes publishing in the same room on return.
 - **Device verification.** A Pixel 5 and iPhone SE (2nd generation) each hosted a 720p, 15 FPS stream. The viewer received filter changes and new frames after the host returned from the background.
 
-## Try the example
-
-The example app is at the root of this repository. From that directory, prepare the local configuration and configure a test UserSig for each participant.
-
-```sh
-python3 tools/bootstrap_local_qa.py
-bash configure.sh
-flutter pub get
-```
-
-Set the host’s Nosmai license in the generated `lib/nosmai_license_local.dart`. The example uses Android application ID `com.nosmai.tencentbridge.example` and iOS bundle ID `com.nosmai.tencentbridge.example`. Production apps should issue each UserSig from their backend and keep the Tencent SDKSecretKey there.
-
-Run each command in a separate terminal, replacing the device IDs with those from `flutter devices`.
-
-```sh
-bash run.sh host HOST_DEVICE_ID
-bash run.sh viewer VIEWER_DEVICE_ID
-```
-
-On the host, open **Beauty & Makeup**, apply an effect and tap **Start Live**. On the second phone, select the same room and tap **Watch Live**. Change the effect on the host to check the remote video. [Example app](lib/main.dart)
-
 Use of the Nosmai and Tencent RTC SDKs is subject to their respective licenses and service terms.

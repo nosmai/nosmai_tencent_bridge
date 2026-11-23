@@ -1,41 +1,13 @@
-# Repository handoff
+# Repository setup
 
-## Current state
+The Flutter plugin lives in `packages/nosmai_tencent_live`. The app at the repository root can build and run its tests from a clean checkout. [Bridge integration guide](README.md)
 
-- `packages/nosmai_tencent_live` is the integration. It is a Flutter plugin, and
-  apps use only its Dart API.
-- The root app is its example. It has no native bridge code: `MainActivity`,
-  `AppDelegate`, Gradle and the Podfile are stock templates.
-- iOS: processed `CVPixelBuffer` forwarding, demonstrated iPhone → Android on
-  real devices.
-- Android: shared-texture forwarding using Nosmai's wait/complete protocol,
-  with automatic I420 fallback. Needs real-device verification.
+## Local credentials
 
-## First checkout
+For a live session, supply the Tencent application ID, user ID and matching server-issued UserSig through Flutter build definitions. Each device needs its own user ID and UserSig. The host also needs `NOSMAI_ANDROID_LICENSE_KEY` or `NOSMAI_IOS_LICENSE_KEY` for its application ID or bundle ID.
 
-1. Install Flutter, the Android SDK and Xcode with CocoaPods.
-2. `python3 tools/bootstrap_local_qa.py` creates ignored placeholder config
-   files. It adds no real secrets.
-3. `bash configure.sh` generates **local** Tencent QA credentials from your
-   SDKAppID and SDKSecretKey. Never commit them.
-4. Put a licensed Nosmai key in `lib/nosmai_license_local.dart`, or pass
-   `--dart-define=NOSMAI_ANDROID_LICENSE_KEY=...` /
-   `--dart-define=NOSMAI_IOS_LICENSE_KEY=...`.
-5. `flutter pub get`, then `flutter analyze lib test`, `flutter test`, and
-   `flutter test` inside `packages/nosmai_tencent_live`.
-6. `bash run.sh host DEVICE_ID` and `bash run.sh viewer DEVICE_ID`.
+The optional launch helpers read a local JSON profile via `--dart-define-from-file`. Copy `config/host.example.json` or `config/viewer.example.json` to `config/host.json` or `config/viewer.json`, fill in that participant’s credentials and add the host license to the host profile. Keep these files local. Use `bash run.sh host DEVICE_ID` or `bash run.sh viewer DEVICE_ID` to launch with that profile.
 
-## Dependencies
+## Tests
 
-The plugin pins `nosmai_effects_sdk` 2.0.x and `tencent_rtc_sdk` 13.5.x from
-pub.dev. A forked Tencent SDK or `pubspec_overrides.yaml` is no longer needed:
-the plugin's Android build raises the Tencent module's compileSdk and aligns
-vectordrawable itself.
-
-## Security
-
-The ignored `config/host.json`, `config/viewer.json` and
-`lib/nosmai_license_local.dart` are local only. Test UserSigs in app assets are
-not production authentication. Use a backend signer and secure license
-delivery for production. If secrets were ever committed, remove them from
-history and rotate them. `.gitignore` does not clean history.
+Run `flutter test` from the repository root for the example app and from `packages/nosmai_tencent_live` for the bridge.

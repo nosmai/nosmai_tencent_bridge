@@ -1,7 +1,3 @@
-import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -9,36 +5,9 @@ import 'app_credentials.dart';
 import 'nosmai_dashboard.dart';
 import 'viewer_page.dart';
 
-// PLAIN_FLUTTER_RUN_V1 - local two-phone QA only.
-Map<bool, AppCredentials> _plainRunProfiles = const {};
-
-Future<void> _loadPlainRunProfiles() async {
-  const explicit = bool.hasEnvironment('SDK_APP_ID') ||
-      bool.hasEnvironment('USER_ID') || bool.hasEnvironment('USER_SIG') ||
-      bool.hasEnvironment('TOKEN_EXPIRES_AT');
-  if (!kDebugMode || explicit) return;
-  try {
-    final profiles = <bool, AppCredentials>{};
-    for (final entry in {true: 'host', false: 'viewer'}.entries) {
-      final text = await rootBundle.loadString('config/${entry.value}.json');
-      final data = jsonDecode(text) as Map<String, dynamic>;
-      profiles[entry.key] = AppCredentials(
-        sdkAppId: int.parse('${data['SDK_APP_ID']}'),
-        userId: data['USER_ID'] as String,
-        userSig: data['USER_SIG'] as String,
-        expiresAt: int.parse('${data['TOKEN_EXPIRES_AT']}'),
-      );
-    }
-    _plainRunProfiles = Map<bool, AppCredentials>.unmodifiable(profiles);
-  } catch (_) {
-    debugPrint('QA config unavailable. Run bash configure.sh, then flutter run.');
-  }
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  await _loadPlainRunProfiles();
   runApp(const TencentLiveApp());
 }
 
@@ -52,7 +21,6 @@ class TencentLiveApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewer = _plainRunProfiles[false] ?? credentials;
     return MaterialApp(
       title: 'Nosmai × Tencent Live',
       debugShowCheckedModeBanner: false,
@@ -70,9 +38,9 @@ class TencentLiveApp extends StatelessWidget {
         ),
       ),
       home: NosmaiDashboardPage(
-        hostCredentials: _plainRunProfiles[true] ?? credentials,
-        viewerCredentials: viewer,
-        buildViewerPage: (roomId) => ViewerPage(credentials: viewer, roomId: roomId),
+        hostCredentials: credentials,
+        viewerCredentials: credentials,
+        buildViewerPage: (roomId) => ViewerPage(credentials: credentials, roomId: roomId),
       ),
     );
   }

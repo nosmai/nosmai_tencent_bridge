@@ -25,20 +25,17 @@ class AppCredentials {
 
   String? validate({DateTime? now}) {
     if (sdkAppId <= 0 || sdkAppId > 4294967295) {
-      return 'Tencent credentials are missing. Run bash configure.sh, then '
-          'launch with flutter run. '
-          'Use your application SDKAppID, not the console account number.';
+      return 'Set SDK_APP_ID to your Tencent application ID and rebuild the app.';
     }
     if (!RegExp(r'^[A-Za-z0-9_-]{1,32}$').hasMatch(userId)) {
       return 'USER_ID must contain 1–32 letters, numbers, underscores or hyphens.';
     }
     if (userSig.trim().isEmpty || userSig.contains('PASTE_')) {
-      return 'USER_SIG is missing. Run bash configure.sh and rebuild the app.';
+      return 'Set USER_SIG to the Tencent UserSig issued for USER_ID and rebuild the app.';
     }
     final seconds = (now ?? DateTime.now()).millisecondsSinceEpoch ~/ 1000;
     if (expiresAt > 0 && seconds >= expiresAt) {
-      return 'This test UserSig has expired. Run bash configure.sh again, '
-          'then stop the app and run flutter run again.';
+      return 'This UserSig has expired. Set USER_SIG to a fresh token and rebuild the app.';
     }
     return null;
   }

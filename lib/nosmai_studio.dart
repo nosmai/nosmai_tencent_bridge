@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:nosmai_tencent_live/nosmai_tencent_live.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
-import 'nosmai_license_local.dart';
 import 'app_credentials.dart';
 
 // Each studio route owns exactly ONE NosmaiCameraPreview. Start Live publishes
@@ -62,18 +61,9 @@ Future<void> openNosmaiStudio(
     return;
   }
   try {
-    // NOSMAI_AUTO_LICENSE_LOCAL_V1: local QA keys unless a platform key is
-    // passed with --dart-define. An empty local iOS key falls back to the
-    // Android one.
-    String key(String fromBuild, String local) =>
-        fromBuild.trim().isNotEmpty ? fromBuild.trim() : local.trim();
     await NosmaiTencentLive.initialize(
-      androidLicenseKey: key(
-          const String.fromEnvironment('NOSMAI_ANDROID_LICENSE_KEY'), nosmaiLocalLicenseKey),
-      iosLicenseKey: key(const String.fromEnvironment('NOSMAI_IOS_LICENSE_KEY'),
-          nosmaiLocalIosLicenseKey.trim().isNotEmpty
-              ? nosmaiLocalIosLicenseKey
-              : nosmaiLocalLicenseKey),
+      androidLicenseKey: const String.fromEnvironment('NOSMAI_ANDROID_LICENSE_KEY'),
+      iosLicenseKey: const String.fromEnvironment('NOSMAI_IOS_LICENSE_KEY'),
     );
   } on NosmaiLiveException catch (e) {
     if (!context.mounted) return;

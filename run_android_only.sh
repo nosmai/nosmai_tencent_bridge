@@ -12,36 +12,24 @@ if [[ $# -gt 2 || ( "$PROFILE" != host && "$PROFILE" != viewer ) ]]; then
   exit 2
 fi
 [[ -f run.sh && -f config/"$PROFILE".json ]] || {
-  echo "ERROR: run.sh or config/$PROFILE.json missing. Run configure.sh first." >&2
+  echo "ERROR: run.sh or config/$PROFILE.json missing. Copy the matching profile template and enter your Tencent credentials." >&2
   exit 1
 }
-ADB="$(python3 - "$ROOT" <<'PY'
-import os, shutil, sys
-from pathlib import Path
-root = Path(sys.argv[1])
-candidates = []
-props = root / 'android/local.properties'
-if props.is_file():
-    for line in props.read_text().splitlines():
-        if line.strip().startswith('sdk.dir='):
-            value = line.strip().split('=', 1)[1]
-            value = value.replace('\\ ', ' ').replace('\\:', ':').replace('\\\\', '\\')
-            candidates.append(str(Path(value).expanduser() / 'platform-tools/adb'))
-for var in ('ANDROID_HOME', 'ANDROID_SDK_ROOT'):
-    if os.environ.get(var):
-        candidates.append(str(Path(os.environ[var]) / 'platform-tools/adb'))
-candidates.append(str(Path.home() / 'Library/Android/sdk/platform-tools/adb'))
-on_path = shutil.which('adb')
-if on_path:
-    candidates.append(on_path)
-for value in candidates:
-    if Path(value).is_file() and os.access(value, os.X_OK):
-        print(value)
-        break
-else:
-    sys.exit('ERROR: Android SDK platform-tools/adb not found.')
-PY
-)"
+sdk_dir=''
+if [[ -r android/local.properties ]]; then
+  sdk_dir=$(sed -n 's/^[[:space:]]*sdk\.dir=//p' android/local.properties | head -n 1)
+  sdk_dir=$(printf '%s' "$sdk_dir" | sed 's/\\\([ :\\]\)/\1/g')
+fi
+ADB=''
+for sdk_root in "$sdk_dir" "${ANDROID_HOME:-}" "${ANDROID_SDK_ROOT:-}" "$HOME/Library/Android/sdk"; do
+  if [[ -n "$sdk_root" && -x "$sdk_root/platform-tools/adb" ]]; then
+    ADB="$sdk_root/platform-tools/adb"
+    break
+  fi
+done
+if [[ -z "$ADB" ]]; then
+  ADB=$(command -v adb) || { echo 'Android SDK platform-tools/adb is required.' >&2; exit 1; }
+fi
 "$ADB" start-server
 LIST="$("$ADB" devices -l)"
 printf '\n%s\n\n' "$LIST"
